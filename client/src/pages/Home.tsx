@@ -369,7 +369,7 @@ export default function Home() {
             <p className="text-lg font-salita text-gray-600 tracking-widest">CLICK ANY GIFT TO OPEN</p>
           </div>
 
-          <div className="flex-1 grid grid-cols-2 gap-4 p-4">
+          <div className="flex-1 grid grid-cols-2 gap-4 p-4 place-items-center">
             {[0, 1, 2, 3].map((idx) => (
               <button
                 key={idx}
@@ -379,16 +379,17 @@ export default function Home() {
                   else if (idx === 2) setScreen('box3');
                   else setScreen('box4');
                 }}
-                className="relative w-full h-full hover:scale-105 active:scale-95 transition-transform duration-300 group touch-manipulation"
+                className="hover:scale-105 active:scale-95 transition-transform duration-300 group touch-manipulation"
+                style={{ width: '150px', height: '150px', padding: 0, backgroundColor: 'transparent', border: 'none', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <img 
+                <img
                   src={getOptimizedUrl("https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp", 800)}
                   srcSet={getSrcSet("https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp")}
-                  alt="Gift Box" 
+                  alt="Gift Box"
                   width="400"
                   height="400"
                   loading="lazy"
-                  className="w-full h-full object-cover"
+                  style={{ maxWidth: '100%', maxHeight: '100%', height: 'auto' }}
                 />
               </button>
             ))}
