@@ -413,22 +413,16 @@ export default function Home() {
 
       {/* Box 2 - Full Screen */}
       {screen === 'box2' && (
-        <div className="relative w-full min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex flex-col items-center justify-center gap-8 animate-fade-in p-6">
+        <div className="w-full min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex flex-col items-center justify-center gap-8 animate-fade-in p-6">
           <img
-            src={getOptimizedUrl("https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif", 800)}
-            srcSet={getSrcSet("https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif")}
+            src="https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif"
             alt="Box 2"
-            width="800"
-            height="800"
-            loading="lazy"
             style={{ width: 'min(80vw, 70vh)', height: 'min(80vw, 70vh)' }}
-            className="object-contain rounded-2xl shadow-2xl"
+            className="object-contain mix-blend-multiply"
           />
-          <div className="absolute bottom-12 left-0 right-0 flex justify-center">
-            <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl">
-              ← Back to Gifts
-            </Button>
-          </div>
+          <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl">
+            ← Back to Gifts
+          </Button>
         </div>
       )}
 
