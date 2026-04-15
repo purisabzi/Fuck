@@ -202,6 +202,72 @@ export default function Home() {
     }, 600);
   };
 
+  useEffect(() => {
+    const layerIds = ['wl1', 'wl2', 'wl3', 'wl4', 'wl5'];
+
+    if (!winningLine) {
+      const els = layerIds.map(id => document.getElementById(id)).filter(Boolean);
+      if ((window as any).gsap) {
+        (window as any).gsap.killTweensOf(els);
+        (window as any).gsap.set(els, { opacity: 0 });
+      }
+      return;
+    }
+
+    // cell = 64px, gap = 12px → step = 76px, first center = 32px
+    const step = 76, half = 32;
+    function coords(idx: number) {
+      return { x: (idx % 3) * step + half, y: Math.floor(idx / 3) * step + half };
+    }
+
+    const s = coords(winningLine[0]);
+    const e = coords(winningLine[2]);
+    const len = Math.hypot(e.x - s.x, e.y - s.y);
+
+    const layers = [
+      { id: 'wl5', drawOpacity: 0.12, drawDuration: 0.7, drawDelay: 0 },
+      { id: 'wl4', drawOpacity: 0.2,  drawDuration: 0.65, drawDelay: 0.03 },
+      { id: 'wl3', drawOpacity: 0.4,  drawDuration: 0.6, drawDelay: 0.05 },
+      { id: 'wl2', drawOpacity: 0.7,  drawDuration: 0.55, drawDelay: 0.07 },
+      { id: 'wl1', drawOpacity: 1,    drawDuration: 0.5, drawDelay: 0.09 },
+    ];
+
+    const g = (window as any).gsap;
+    if (!g) return;
+
+    // Draw all layers with staggered timing for cinematic reveal
+    layers.forEach(({ id, drawOpacity, drawDuration, drawDelay }) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.setAttribute('x1', String(s.x)); el.setAttribute('y1', String(s.y));
+      el.setAttribute('x2', String(e.x)); el.setAttribute('y2', String(e.y));
+      g.set(el, { strokeDasharray: len, strokeDashoffset: len, opacity: drawOpacity });
+      g.to(el, { strokeDashoffset: 0, duration: drawDuration, delay: drawDelay, ease: 'power2.out' });
+    });
+
+    // After the line is drawn, start a smooth breathing glow pulse
+    const pulseDelay = 0.75;
+    // Outer bloom breathes slowly
+    g.to(document.getElementById('wl5'), {
+      opacity: 0.25, duration: 1.4, delay: pulseDelay, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+    g.to(document.getElementById('wl4'), {
+      opacity: 0.4, duration: 1.2, delay: pulseDelay + 0.05, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+    // Mid glow breathes at medium pace
+    g.to(document.getElementById('wl3'), {
+      opacity: 0.65, duration: 1.0, delay: pulseDelay + 0.1, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+    g.to(document.getElementById('wl2'), {
+      opacity: 0.9, duration: 0.9, delay: pulseDelay + 0.12, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+    // Core stays bright with subtle flicker
+    g.to(document.getElementById('wl1'), {
+      opacity: 0.85, duration: 0.7, delay: pulseDelay + 0.15, yoyo: true, repeat: -1, ease: 'sine.inOut'
+    });
+
+  }, [winningLine]);
+
   const resetGame = () => {
     setBoard(Array(9).fill(null));
     setShowWonBox(false);
@@ -236,11 +302,6 @@ export default function Home() {
             {board[index]}
           </span>
         )}
-        {isWinningCell && winningLine && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-full h-1 bg-red-500 animate-strikethrough" />
-          </div>
-        )}
       </button>
     );
   };
@@ -266,10 +327,59 @@ export default function Home() {
             <p className="text-pink-500 text-sm">Play to unlock your surprise 🎁</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-10 bg-white/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-              <TicTacToeCell key={index} index={index} />
-            ))}
+          <div className="relative mb-10">
+            {/* SVG win line overlay — cinematic neon glow with SVG filters */}
+            <svg
+              className="absolute pointer-events-none z-10"
+              style={{ top: 24, left: 24, width: 216, height: 216, overflow: 'visible' }}
+              viewBox="0 0 216 216"
+            >
+              <defs>
+                {/* Wide soft outer bloom */}
+                <filter id="neon-bloom" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur1" />
+                  <feColorMatrix in="blur1" type="matrix"
+                    values="1.2 0 0 0 0  0 0.1 0 0 0  0 0 0.15 0 0  0 0 0 1 0"
+                    result="colorBlur1" />
+                  <feMerge>
+                    <feMergeNode in="colorBlur1" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                {/* Medium glow */}
+                <filter id="neon-mid" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur2" />
+                  <feMerge>
+                    <feMergeNode in="blur2" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                {/* Tight inner glow */}
+                <filter id="neon-core" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur3" />
+                  <feMerge>
+                    <feMergeNode in="blur3" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              {/* Layer 5: ultra-wide ambient bloom */}
+              <line id="wl5" stroke="#ff0030" strokeWidth="36" strokeLinecap="round" opacity="0" fill="none" filter="url(#neon-bloom)" />
+              {/* Layer 4: wide soft glow */}
+              <line id="wl4" stroke="#ff1040" strokeWidth="24" strokeLinecap="round" opacity="0" fill="none" filter="url(#neon-bloom)" />
+              {/* Layer 3: medium neon glow */}
+              <line id="wl3" stroke="#ff2050" strokeWidth="14" strokeLinecap="round" opacity="0" fill="none" filter="url(#neon-mid)" />
+              {/* Layer 2: bright inner glow */}
+              <line id="wl2" stroke="#ff4070" strokeWidth="7" strokeLinecap="round" opacity="0" fill="none" filter="url(#neon-core)" />
+              {/* Layer 1: white-hot core */}
+              <line id="wl1" stroke="#fff0f4" strokeWidth="3" strokeLinecap="round" opacity="0" fill="none" filter="url(#neon-core)" />
+            </svg>
+
+            <div className="grid grid-cols-3 gap-3 bg-white/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+              {[0,1,2,3,4,5,6,7,8].map((index) => (
+                <TicTacToeCell key={index} index={index} />
+              ))}
+            </div>
           </div>
 
           {showWonBox && (
