@@ -82,7 +82,7 @@ export default function Home() {
   const [cakeBlow, setCakeBlow] = useState(false);
   const [showWonBox, setShowWonBox] = useState(false);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameState, setGameState] = useState<"playing" | "ai-turn" | "won" | "draw">("playing");
   const [typedTitle, setTypedTitle] = useState('');
   const mainAudioRef = React.useRef<HTMLAudioElement>(null);
   const box4AudioRef = React.useRef<HTMLAudioElement>(null);
@@ -130,83 +130,121 @@ export default function Home() {
   }, [screen, musicPlaying]);
 
   const calculateWinner = (squares: (string | null)[]) => {
-    const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-    for (let line of lines) {
-      const [a, b, c] = line;
+    const lines = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6],
+    ];
+    for (let [a, b, c] of lines) {
       if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-        return { winner: squares[a], line };
+        return { winner: squares[a], line: [a, b, c] };
       }
     }
     return null;
   };
 
-  const makeAIMove = (currentBoard: (string | null)[]) => {
-    const emptySquares = currentBoard
+  const getBestMove = (currentBoard: (string | null)[]) => {
+    // 1. Win if possible
+    for (let i = 0; i < 9; i++) {
+      if (!currentBoard[i]) {
+        const copy = [...currentBoard];
+        copy[i] = 'O';
+        if (calculateWinner(copy)?.winner === 'O') return i;
+      }
+    }
+
+    // 2. Block player
+    for (let i = 0; i < 9; i++) {
+      if (!currentBoard[i]) {
+        const copy = [...currentBoard];
+        copy[i] = 'X';
+        if (calculateWinner(copy)?.winner === 'X') return i;
+      }
+    }
+
+    // 3. Take center
+    if (!currentBoard[4]) return 4;
+
+    // 4. Corners
+    const corners = [0, 2, 6, 8].filter(i => !currentBoard[i]);
+    if (corners.length) {
+      return corners[Math.floor(Math.random() * corners.length)];
+    }
+
+    // 5. Random fallback
+    const empty = currentBoard
       .map((v, i) => (v === null ? i : null))
-      .filter((v) => v !== null) as number[];
+      .filter(v => v !== null) as number[];
 
-    if (emptySquares.length === 0) return currentBoard;
-
-    const newBoard = [...currentBoard];
-
-    // Check if AI can win
-    for (let i of emptySquares) {
-      newBoard[i] = 'O';
-      if (calculateWinner(newBoard)?.winner === 'O') {
-        return newBoard;
-      }
-      newBoard[i] = null;
-    }
-
-    // Check if player can win and block
-    for (let i of emptySquares) {
-      newBoard[i] = 'X';
-      if (calculateWinner(newBoard)?.winner === 'X') {
-        newBoard[i] = 'O';
-        return newBoard;
-      }
-      newBoard[i] = null;
-    }
-
-    // Pick random
-    const randomIndex = emptySquares[Math.floor(Math.random() * emptySquares.length)];
-    newBoard[randomIndex] = 'O';
-    return newBoard;
+    return empty.length
+      ? empty[Math.floor(Math.random() * empty.length)]
+      : -1;
   };
 
   const handleTicTacToe = (index: number) => {
-    if (gameOver || board[index] || calculateWinner(board)) return;
+    if (board[index] || gameState !== "playing") return;
 
     const newBoard = [...board];
     newBoard[index] = 'X';
     setBoard(newBoard);
 
-    const playerWon = calculateWinner(newBoard);
-    if (playerWon) {
-      setWinningLine(playerWon.line);
-      setGameOver(true);
-      setTimeout(() => setShowWonBox(true), 600);
+    const result = calculateWinner(newBoard);
+    if (result) {
+      setWinningLine(result.line);
+      setGameState("won");
       return;
     }
 
-    // AI move after a delay
-    setTimeout(() => {
-      const aiBoard = makeAIMove(newBoard);
-      setBoard(aiBoard);
+    if (!newBoard.includes(null)) {
+      setGameState("draw");
+      return;
+    }
 
-      const aiWon = calculateWinner(aiBoard);
-      if (aiWon) {
-        setWinningLine(aiWon.line);
-        setGameOver(true);
-      }
-    }, 600);
+    setGameState("ai-turn");
   };
+
+  // AI turn controlled by useEffect — no race conditions
+  useEffect(() => {
+    if (gameState !== "ai-turn") return;
+
+    const timer = setTimeout(() => {
+      const bestMove = getBestMove(board);
+      if (bestMove === -1) return;
+
+      const newBoard = [...board];
+      newBoard[bestMove] = 'O';
+      setBoard(newBoard);
+
+      const result = calculateWinner(newBoard);
+      if (result) {
+        setWinningLine(result.line);
+        setGameState("won");
+        return;
+      }
+
+      if (!newBoard.includes(null)) {
+        setGameState("draw");
+        return;
+      }
+
+      setGameState("playing");
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [gameState, board]);
+
+  // Show won box after a short delay when game is won
+  useEffect(() => {
+    if (gameState !== "won") return;
+    const timer = setTimeout(() => setShowWonBox(true), 600);
+    return () => clearTimeout(timer);
+  }, [gameState]);
 
   const resetGame = () => {
     setBoard(Array(9).fill(null));
     setShowWonBox(false);
     setWinningLine(null);
-    setGameOver(false);
+    setGameState("playing");
   };
 
   const resetToFirstPage = () => {
@@ -214,6 +252,7 @@ export default function Home() {
     setCakeBlow(false);
     setScreen('tictactoe');
     setMusicPlaying(false);
+    setGameState("playing");
     if (mainAudioRef.current) {
       mainAudioRef.current.pause();
       mainAudioRef.current.currentTime = 0;
