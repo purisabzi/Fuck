@@ -257,4 +257,39 @@
   .animate-fade-in {
     animation: fadeIn 0.5s ease-in forwards;
   }
+
+  /*
+   * STEP 2: Universal Transparency Rules
+   * Makes all card/container elements invisible so content floats on the page background.
+   */
+  [data-slot="card"],
+  [data-slot="item"],
+  [data-slot="alert"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+  }
+
+  [data-slot="card-content"],
+  [data-slot="card-header"],
+  [data-slot="card-footer"],
+  [data-slot="item-content"],
+  [data-slot="item-header"],
+  [data-slot="item-footer"] {
+    padding: 0;
+  }
+
+  /*
+   * STEP 3: Responsive Image & GIF Rules
+   * Ensures all images within the invisible containers are perfectly scaled.
+   */
+  [data-slot="card"] img,
+  [data-slot="item"] img,
+  [data-slot="alert"] img {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    display: block;
+  }
 }
