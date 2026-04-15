@@ -303,14 +303,10 @@ export default function Home() {
       {/* GIF 1 */}
       {screen === 'gif1' && (
         <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-100 flex flex-col items-center justify-center p-8">
-          <img 
-            src={getOptimizedUrl("https://i.ibb.co/5WXF6r7L/4572be0dfbefad294e5d4ab55b110bd2-1.gif", 800)}
-            srcSet={getSrcSet("https://i.ibb.co/5WXF6r7L/4572be0dfbefad294e5d4ab55b110bd2-1.gif")}
-            alt="GIF 1" 
-            width="320"
-            height="320"
-            fetchpriority="high"
-            className="w-80 h-80 mb-12 rounded-2xl shadow-2xl object-cover" 
+          <img
+            src="https://i.ibb.co/5WXF6r7L/4572be0dfbefad294e5d4ab55b110bd2-1.gif"
+            alt="GIF 1"
+            className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
           <Button onClick={() => setScreen('gif2')} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
             Next
@@ -322,14 +318,10 @@ export default function Home() {
       {screen === 'gif2' && (
         <div className="w-full h-full bg-gradient-to-br from-pink-200 to-pink-100 flex flex-col items-center justify-center p-8">
           <h1 className="text-4xl font-display text-pink-700 mb-8">Are u ready for surprise?</h1>
-          <img 
-            src={getOptimizedUrl("https://i.ibb.co/SX7cfTGt/c37e7391eb8723e85aa7e0cfc59df31b.gif", 800)}
-            srcSet={getSrcSet("https://i.ibb.co/SX7cfTGt/c37e7391eb8723e85aa7e0cfc59df31b.gif")}
-            alt="GIF 2" 
-            loading="lazy"
-            width="320"
-            height="320"
-            className="w-80 h-80 mb-12 rounded-2xl shadow-2xl object-cover" 
+          <img
+            src="https://i.ibb.co/SX7cfTGt/c37e7391eb8723e85aa7e0cfc59df31b.gif"
+            alt="GIF 2"
+            className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
           <div className="flex gap-6">
             <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
@@ -346,14 +338,10 @@ export default function Home() {
       {screen === 'howdareyou' && (
         <div className="w-full h-full bg-gradient-to-br from-pink-200 to-pink-100 flex flex-col items-center justify-center p-8">
           <h1 className="text-6xl font-display text-pink-700 mb-12">HOW DARE YOU!</h1>
-          <img 
-            src={getOptimizedUrl("https://i.ibb.co/TBJLC5Rq/image.gif", 800)}
-            srcSet={getSrcSet("https://i.ibb.co/TBJLC5Rq/image.gif")}
-            alt="How Dare You" 
-            loading="lazy"
-            width="320"
-            height="320"
-            className="w-80 h-80 mb-12 rounded-2xl shadow-2xl object-cover" 
+          <img
+            src="https://i.ibb.co/TBJLC5Rq/image.gif"
+            alt="How Dare You"
+            className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
           <Button onClick={() => setScreen('gif2')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
             TRY AGAIN
@@ -425,22 +413,16 @@ export default function Home() {
 
       {/* Box 2 - Full Screen */}
       {screen === 'box2' && (
-        <div className="relative w-full min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex flex-col items-center justify-center gap-8 animate-fade-in p-6">
+        <div className="w-full min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex flex-col items-center justify-center gap-8 animate-fade-in p-6">
           <img
-            src={getOptimizedUrl("https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif", 800)}
-            srcSet={getSrcSet("https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif")}
+            src="https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif"
             alt="Box 2"
-            width="800"
-            height="800"
-            loading="lazy"
             style={{ width: 'min(80vw, 70vh)', height: 'min(80vw, 70vh)' }}
-            className="object-contain rounded-2xl shadow-2xl"
+            className="object-contain mix-blend-multiply"
           />
-          <div className="absolute bottom-12 left-0 right-0 flex justify-center">
-            <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl">
-              ← Back to Gifts
-            </Button>
-          </div>
+          <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl">
+            ← Back to Gifts
+          </Button>
         </div>
       )}
 
