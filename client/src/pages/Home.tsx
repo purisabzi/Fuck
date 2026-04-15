@@ -224,6 +224,105 @@ export default function Home() {
     }
   };
 
+  // GSAP win-line animation — 3-layer neon SVG overlay
+  useEffect(() => {
+    const g = (window as any).gsap;
+    const els = ['wl1', 'wl2', 'wl3'].map(id => document.getElementById(id)).filter(Boolean);
+
+    if (!winningLine) {
+      // Reset — kill tweens, hide lines
+      if (g) {
+        g.killTweensOf(els);
+        g.set(els, { opacity: 0 });
+      }
+      return;
+    }
+
+    if (!g) return;
+
+    // cell = 64px (w-16), gap = 12px (gap-3) → step = 76px, first center = 32px
+    const step = 76, half = 32;
+    function coords(idx: number) {
+      return { x: (idx % 3) * step + half, y: Math.floor(idx / 3) * step + half };
+    }
+
+    const s = coords(winningLine[0]);
+    const e = coords(winningLine[2]);
+    const len = Math.hypot(e.x - s.x, e.y - s.y);
+
+    // Extend line past cell centers for a more dramatic slash
+    const dx = e.x - s.x, dy = e.y - s.y;
+    const extend = 18;
+    const norm = Math.sqrt(dx * dx + dy * dy) || 1;
+    const sx = s.x - (dx / norm) * extend;
+    const sy = s.y - (dy / norm) * extend;
+    const ex = e.x + (dx / norm) * extend;
+    const ey = e.y + (dy / norm) * extend;
+    const totalLen = len + extend * 2;
+
+    const layers = [
+      { id: 'wl3', finalOpacity: 0.18 },  // outermost glow
+      { id: 'wl2', finalOpacity: 0.55 },  // mid glow
+      { id: 'wl1', finalOpacity: 1 },     // white core
+    ];
+
+    // Master timeline for cinematic sequencing
+    const tl = g.timeline();
+
+    layers.forEach(({ id, finalOpacity }, i) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.setAttribute('x1', String(sx));
+      el.setAttribute('y1', String(sy));
+      el.setAttribute('x2', String(ex));
+      el.setAttribute('y2', String(ey));
+
+      // Set initial state — line fully hidden via dash offset
+      g.set(el, {
+        strokeDasharray: totalLen,
+        strokeDashoffset: totalLen,
+        opacity: finalOpacity,
+      });
+
+      // Staggered draw-on with cinematic elastic ease
+      tl.to(el, {
+        strokeDashoffset: 0,
+        duration: 0.55,
+        ease: 'power4.out',
+      }, i * 0.06);
+    });
+
+    // After the line is fully drawn, start the glow pulse
+    tl.to(document.getElementById('wl3'), {
+      opacity: 0.4,
+      duration: 0.8,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    }, 0.65);
+
+    tl.to(document.getElementById('wl2'), {
+      opacity: 0.85,
+      duration: 1.1,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    }, 0.65);
+
+    // Subtle white core pulse for extra polish
+    tl.to(document.getElementById('wl1'), {
+      opacity: 0.7,
+      duration: 1.4,
+      yoyo: true,
+      repeat: -1,
+      ease: 'sine.inOut',
+    }, 0.7);
+
+    return () => {
+      tl.kill();
+    };
+  }, [winningLine]);
+
   const TicTacToeCell = ({ index }: { index: number }) => {
     const isWinningCell = winningLine?.includes(index);
     return (
@@ -235,11 +334,6 @@ export default function Home() {
           <span className={isWinningCell ? 'animate-heart-pulse' : ''}>
             {board[index]}
           </span>
-        )}
-        {isWinningCell && winningLine && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-full h-1 bg-red-500 animate-strikethrough" />
-          </div>
         )}
       </button>
     );
@@ -266,10 +360,23 @@ export default function Home() {
             <p className="text-pink-500 text-sm">Play to unlock your surprise 🎁</p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3 mb-10 bg-white/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-              <TicTacToeCell key={index} index={index} />
-            ))}
+          <div className="relative mb-10">
+            {/* SVG win line overlay — sits over the board */}
+            <svg
+              className="absolute pointer-events-none z-10"
+              style={{ top: 24, left: 24, width: 216, height: 216, overflow: 'visible' }}
+              viewBox="0 0 216 216"
+            >
+              <line id="wl3" stroke="#ff2d75" strokeWidth="22" strokeLinecap="round" opacity="0" fill="none"/>
+              <line id="wl2" stroke="#ff2d75" strokeWidth="10" strokeLinecap="round" opacity="0" fill="none"/>
+              <line id="wl1" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0" fill="none"/>
+            </svg>
+
+            <div className="grid grid-cols-3 gap-3 bg-white/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+                <TicTacToeCell key={index} index={index} />
+              ))}
+            </div>
           </div>
 
           {showWonBox && (
