@@ -1,8 +1,16 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
 
-type Screen = 'tictactoe' | 'gif1' | 'gif2' | 'howdareyou' | 'giftgrid' | 'box1' | 'box2' | 'box3' | 'box4';
+type Screen =
+  | "tictactoe"
+  | "gif1"
+  | "gif2"
+  | "howdareyou"
+  | "giftgrid"
+  | "box1"
+  | "box2"
+  | "box3"
+  | "box4";
 
 const LETTER_TEXT = `𝐻𝑎𝑝𝑝𝑦 𝐵𝑖𝑟𝑡ℎ𝑑𝑎𝑦, 𝑚𝑦 𝑃𝑎𝑟𝑖 ✨🌷
 
@@ -25,7 +33,7 @@ const LETTER_TEXT = `𝐻𝑎𝑝𝑝𝑦 𝐵𝑖𝑟𝑡ℎ𝑑𝑎𝑦, 𝑚�
 𝐻𝑎𝑝𝑝𝑦 𝐵𝑖𝑟𝑡ℎ𝑑𝑎𝑦 𝑎𝑔𝑎𝑖𝑛… 𝑚𝑒𝑟𝑖 𝑓𝑎𝑣𝑜𝑢𝑟𝑖𝑡𝑒 𝑓𝑒𝑒𝑙𝑖𝑛𝑔 ✨`;
 
 // Netlify Image CDN Utility
-const isGif = (url: string) => url.toLowerCase().endsWith('.gif');
+const isGif = (url: string) => url.toLowerCase().endsWith(".gif");
 
 const getOptimizedUrl = (url: string, width: number) => {
   if (isGif(url)) return url;
@@ -40,15 +48,16 @@ const getSrcSet = (url: string) => {
 // Floating hearts for win/lose popup
 function FloatingHearts() {
   const positions = [
-    { top: '-40px', left: '-40px' },
-    { top: '-40px', right: '-40px' },
-    { bottom: '-40px', left: '-40px' },
-    { bottom: '-40px', right: '-40px' },
-    { top: '-40px', left: '50%', transform: 'translateX(-50%)' },
-    { bottom: '-40px', left: '50%', transform: 'translateX(-50%)' },
+    { top: "-40px", left: "-40px" },
+    { top: "-40px", right: "-40px" },
+    { bottom: "-40px", left: "-40px" },
+    { bottom: "-40px", right: "-40px" },
+    { top: "-40px", left: "50%", transform: "translateX(-50%)" },
+    { bottom: "-40px", left: "50%", transform: "translateX(-50%)" },
   ];
-  
-  const heartUrl = "https://i.ibb.co/0j7jk8cF/b158f4cc0584572b4cdab742ef9bf7c0.gif";
+
+  const heartUrl =
+    "https://i.ibb.co/0j7jk8cF/b158f4cc0584572b4cdab742ef9bf7c0.gif";
 
   return (
     <>
@@ -64,8 +73,8 @@ function FloatingHearts() {
           className="absolute pointer-events-none"
           style={{
             ...style,
-            width: '70px',
-            height: '70px',
+            width: "70px",
+            height: "70px",
             animation: `float ${3 + (i % 3)}s ease-in-out infinite`,
             animationDelay: `${i * 0.3}s`,
           }}
@@ -76,22 +85,24 @@ function FloatingHearts() {
 }
 
 export default function Home() {
-  const [screen, setScreen] = useState<Screen>('tictactoe');
+  const [screen, setScreen] = useState<Screen>("tictactoe");
   const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [cakeBlow, setCakeBlow] = useState(false);
   const [showWonBox, setShowWonBox] = useState(false);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
-  const [gameState, setGameState] = useState<"playing" | "ai-turn" | "won" | "lost" | "draw">("playing");
-  const [typedTitle, setTypedTitle] = useState('');
-  const mainAudioRef = React.useRef<HTMLAudioElement>(null);
-  const box4AudioRef = React.useRef<HTMLAudioElement>(null);
+  const [gameState, setGameState] = useState<
+    "playing" | "ai-turn" | "won" | "lost" | "draw"
+  >("playing");
+  const [typedTitle, setTypedTitle] = useState("");
+  const mainAudioRef = useRef<HTMLAudioElement>(null);
+  const box4AudioRef = useRef<HTMLAudioElement>(null);
 
-  const GIFT_TITLE = 'Gifts For You';
+  const GIFT_TITLE = "Gifts For You";
 
   useEffect(() => {
-    if (screen === 'giftgrid') {
-      setTypedTitle('');
+    if (screen === "giftgrid") {
+      setTypedTitle("");
       let i = 0;
       const interval = setInterval(() => {
         i++;
@@ -114,7 +125,7 @@ export default function Home() {
     const box4Audio = box4AudioRef.current;
     if (!mainAudio || !box4Audio) return;
 
-    if (screen === 'box4') {
+    if (screen === "box4") {
       mainAudio.pause();
       box4Audio.currentTime = 0;
       box4Audio.play();
@@ -131,12 +142,21 @@ export default function Home() {
 
   const calculateWinner = (squares: (string | null)[]) => {
     const lines = [
-      [0, 1, 2], [3, 4, 5], [6, 7, 8],
-      [0, 3, 6], [1, 4, 7], [2, 5, 8],
-      [0, 4, 8], [2, 4, 6],
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6],
     ];
     for (let [a, b, c] of lines) {
-      if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      if (
+        squares[a] &&
+        squares[a] === squares[b] &&
+        squares[a] === squares[c]
+      ) {
         return { winner: squares[a], line: [a, b, c] };
       }
     }
@@ -148,8 +168,8 @@ export default function Home() {
     for (let i = 0; i < 9; i++) {
       if (!currentBoard[i]) {
         const copy = [...currentBoard];
-        copy[i] = 'O';
-        if (calculateWinner(copy)?.winner === 'O') return i;
+        copy[i] = "O";
+        if (calculateWinner(copy)?.winner === "O") return i;
       }
     }
 
@@ -157,8 +177,8 @@ export default function Home() {
     for (let i = 0; i < 9; i++) {
       if (!currentBoard[i]) {
         const copy = [...currentBoard];
-        copy[i] = 'X';
-        if (calculateWinner(copy)?.winner === 'X') return i;
+        copy[i] = "X";
+        if (calculateWinner(copy)?.winner === "X") return i;
       }
     }
 
@@ -176,16 +196,14 @@ export default function Home() {
       .map((v, i) => (v === null ? i : null))
       .filter(v => v !== null) as number[];
 
-    return empty.length
-      ? empty[Math.floor(Math.random() * empty.length)]
-      : -1;
+    return empty.length ? empty[Math.floor(Math.random() * empty.length)] : -1;
   };
 
   const handleTicTacToe = (index: number) => {
     if (board[index] || gameState !== "playing") return;
 
     const newBoard = [...board];
-    newBoard[index] = 'X';
+    newBoard[index] = "X";
     setBoard(newBoard);
 
     const result = calculateWinner(newBoard);
@@ -212,7 +230,7 @@ export default function Home() {
       if (bestMove === -1) return;
 
       const newBoard = [...board];
-      newBoard[bestMove] = 'O';
+      newBoard[bestMove] = "O";
       setBoard(newBoard);
 
       const result = calculateWinner(newBoard);
@@ -250,7 +268,7 @@ export default function Home() {
   const resetToFirstPage = () => {
     resetGame();
     setCakeBlow(false);
-    setScreen('tictactoe');
+    setScreen("tictactoe");
     setMusicPlaying(false);
     setGameState("playing");
     if (mainAudioRef.current) {
@@ -266,7 +284,9 @@ export default function Home() {
   // GSAP win-line animation — 3-layer neon SVG overlay
   useEffect(() => {
     const g = (window as any).gsap;
-    const els = ['wl1', 'wl2', 'wl3'].map(id => document.getElementById(id)).filter(Boolean);
+    const els = ["wl1", "wl2", "wl3"]
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
 
     if (!winningLine) {
       // Reset — kill tweens, hide lines
@@ -280,9 +300,13 @@ export default function Home() {
     if (!g) return;
 
     // cell = 64px (w-16), gap = 12px (gap-3) → step = 76px, first center = 32px
-    const step = 76, half = 32;
+    const step = 76,
+      half = 32;
     function coords(idx: number) {
-      return { x: (idx % 3) * step + half, y: Math.floor(idx / 3) * step + half };
+      return {
+        x: (idx % 3) * step + half,
+        y: Math.floor(idx / 3) * step + half,
+      };
     }
 
     const s = coords(winningLine[0]);
@@ -290,7 +314,8 @@ export default function Home() {
     const len = Math.hypot(e.x - s.x, e.y - s.y);
 
     // Extend line past cell centers for a more dramatic slash
-    const dx = e.x - s.x, dy = e.y - s.y;
+    const dx = e.x - s.x,
+      dy = e.y - s.y;
     const extend = 18;
     const norm = Math.sqrt(dx * dx + dy * dy) || 1;
     const sx = s.x - (dx / norm) * extend;
@@ -300,9 +325,9 @@ export default function Home() {
     const totalLen = len + extend * 2;
 
     const layers = [
-      { id: 'wl3', finalOpacity: 0.18 },  // outermost glow
-      { id: 'wl2', finalOpacity: 0.55 },  // mid glow
-      { id: 'wl1', finalOpacity: 1 },     // white core
+      { id: "wl3", finalOpacity: 0.18 }, // outermost glow
+      { id: "wl2", finalOpacity: 0.55 }, // mid glow
+      { id: "wl1", finalOpacity: 1 }, // white core
     ];
 
     // Master timeline for cinematic sequencing
@@ -311,10 +336,10 @@ export default function Home() {
     layers.forEach(({ id, finalOpacity }, i) => {
       const el = document.getElementById(id);
       if (!el) return;
-      el.setAttribute('x1', String(sx));
-      el.setAttribute('y1', String(sy));
-      el.setAttribute('x2', String(ex));
-      el.setAttribute('y2', String(ey));
+      el.setAttribute("x1", String(sx));
+      el.setAttribute("y1", String(sy));
+      el.setAttribute("x2", String(ex));
+      el.setAttribute("y2", String(ey));
 
       // Set initial state — line fully hidden via dash offset
       g.set(el, {
@@ -324,38 +349,54 @@ export default function Home() {
       });
 
       // Staggered draw-on with cinematic elastic ease
-      tl.to(el, {
-        strokeDashoffset: 0,
-        duration: 0.55,
-        ease: 'power4.out',
-      }, i * 0.06);
+      tl.to(
+        el,
+        {
+          strokeDashoffset: 0,
+          duration: 0.55,
+          ease: "power4.out",
+        },
+        i * 0.06
+      );
     });
 
     // After the line is fully drawn, start the glow pulse
-    tl.to(document.getElementById('wl3'), {
-      opacity: 0.4,
-      duration: 0.8,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
-    }, 0.65);
+    tl.to(
+      document.getElementById("wl3"),
+      {
+        opacity: 0.4,
+        duration: 0.8,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+      },
+      0.65
+    );
 
-    tl.to(document.getElementById('wl2'), {
-      opacity: 0.85,
-      duration: 1.1,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
-    }, 0.65);
+    tl.to(
+      document.getElementById("wl2"),
+      {
+        opacity: 0.85,
+        duration: 1.1,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+      },
+      0.65
+    );
 
     // Subtle white core pulse for extra polish
-    tl.to(document.getElementById('wl1'), {
-      opacity: 0.7,
-      duration: 1.4,
-      yoyo: true,
-      repeat: -1,
-      ease: 'sine.inOut',
-    }, 0.7);
+    tl.to(
+      document.getElementById("wl1"),
+      {
+        opacity: 0.7,
+        duration: 1.4,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+      },
+      0.7
+    );
 
     return () => {
       tl.kill();
@@ -370,7 +411,7 @@ export default function Home() {
         className="relative w-16 h-16 bg-white border-2 border-pink-300 text-xl font-bold text-pink-600 hover:bg-pink-50 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg"
       >
         {board[index] && (
-          <span className={isWinningCell ? 'animate-heart-pulse' : ''}>
+          <span className={isWinningCell ? "animate-heart-pulse" : ""}>
             {board[index]}
           </span>
         )}
@@ -380,7 +421,6 @@ export default function Home() {
 
   return (
     <div className="relative w-screen h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-pink-50 via-white to-pink-100">
-
       {/* Global Watermark - Made by Pixel Care */}
       <div className="fixed bottom-2 left-0 right-0 flex justify-center z-50 pointer-events-none">
         <span className="bg-black/30 text-white/90 px-3 py-1 rounded-full text-[10px] tracking-widest font-medium backdrop-blur-sm border border-white/20 shadow-sm">
@@ -388,31 +428,68 @@ export default function Home() {
         </span>
       </div>
 
-      <audio ref={mainAudioRef} src="https://res.cloudinary.com/dt9r8o9z7/video/upload/v1775590718/Diet_Mountain_Dew_spotdown.org_uxdqcf.mp3" />
-      <audio ref={box4AudioRef} src="https://res.cloudinary.com/dt9r8o9z7/video/upload/q_auto/f_auto/v1775689533/Afsos_spotdown.org_qckadj.mp3" />
+      <audio
+        ref={mainAudioRef}
+        src="https://res.cloudinary.com/dt9r8o9z7/video/upload/v1775590718/Diet_Mountain_Dew_spotdown.org_uxdqcf.mp3"
+      />
+      <audio
+        ref={box4AudioRef}
+        src="https://res.cloudinary.com/dt9r8o9z7/video/upload/q_auto/f_auto/v1775689533/Afsos_spotdown.org_qckadj.mp3"
+      />
 
       {/* Tic Tac Toe */}
-      {screen === 'tictactoe' && (
+      {screen === "tictactoe" && (
         <div className="w-full h-full bg-gradient-to-br from-pink-100 to-pink-50 flex flex-col items-center justify-center p-8">
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-display text-pink-600 mb-2">Tic Tac Toe</h1>
-            <p className="text-pink-500 text-sm">Play to unlock your surprise 🎁</p>
+            <h1 className="text-5xl font-display text-pink-600 mb-2">
+              Tic Tac Toe
+            </h1>
+            <p className="text-pink-500 text-sm">
+              Play to unlock your surprise 🎁
+            </p>
           </div>
 
           <div className="relative mb-10">
             {/* SVG win line overlay — sits over the board */}
             <svg
               className="absolute pointer-events-none z-10"
-              style={{ top: 24, left: 24, width: 216, height: 216, overflow: 'visible' }}
+              style={{
+                top: 24,
+                left: 24,
+                width: 216,
+                height: 216,
+                overflow: "visible",
+              }}
               viewBox="0 0 216 216"
             >
-              <line id="wl3" stroke="#ff2d75" strokeWidth="22" strokeLinecap="round" opacity="0" fill="none"/>
-              <line id="wl2" stroke="#ff2d75" strokeWidth="10" strokeLinecap="round" opacity="0" fill="none"/>
-              <line id="wl1" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0" fill="none"/>
+              <line
+                id="wl3"
+                stroke="#ff2d75"
+                strokeWidth="22"
+                strokeLinecap="round"
+                opacity="0"
+                fill="none"
+              />
+              <line
+                id="wl2"
+                stroke="#ff2d75"
+                strokeWidth="10"
+                strokeLinecap="round"
+                opacity="0"
+                fill="none"
+              />
+              <line
+                id="wl1"
+                stroke="#ffffff"
+                strokeWidth="4"
+                strokeLinecap="round"
+                opacity="0"
+                fill="none"
+              />
             </svg>
 
             <div className="grid grid-cols-3 gap-3 bg-white/80 p-6 rounded-2xl shadow-xl backdrop-blur-sm">
-              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(index => (
                 <TicTacToeCell key={index} index={index} />
               ))}
             </div>
@@ -430,7 +507,7 @@ export default function Home() {
                       width="120"
                       height="120"
                       className="rounded-2xl drop-shadow-lg"
-                      style={{ animation: 'float 3s ease-in-out infinite' }}
+                      style={{ animation: "float 3s ease-in-out infinite" }}
                     />
                   </div>
                 )}
@@ -438,11 +515,21 @@ export default function Home() {
                   {gameState === "won" ? "You won!" : "You lost! Try again 💪"}
                 </p>
                 <div className="flex gap-4 justify-center relative z-10">
-                  <Button onClick={resetGame} className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 text-sm font-bold rounded-full">
+                  <Button
+                    onClick={resetGame}
+                    className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 text-sm font-bold rounded-full"
+                  >
                     Play Again
                   </Button>
                   {gameState === "won" && (
-                    <Button onClick={() => { setScreen('gif1'); playMusic(); resetGame(); }} className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full">
+                    <Button
+                      onClick={() => {
+                        setScreen("gif1");
+                        playMusic();
+                        resetGame();
+                      }}
+                      className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full"
+                    >
                       Next
                     </Button>
                   )}
@@ -452,10 +539,20 @@ export default function Home() {
           )}
 
           <div className="flex gap-4">
-            <Button onClick={resetGame} className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 text-sm font-bold rounded-full shadow-lg">
+            <Button
+              onClick={resetGame}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 text-sm font-bold rounded-full shadow-lg"
+            >
               Restart
             </Button>
-            <Button onClick={() => { setScreen('gif1'); playMusic(); resetGame(); }} className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full shadow-lg">
+            <Button
+              onClick={() => {
+                setScreen("gif1");
+                playMusic();
+                resetGame();
+              }}
+              className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full shadow-lg"
+            >
               Next
             </Button>
           </div>
@@ -463,33 +560,44 @@ export default function Home() {
       )}
 
       {/* GIF 1 */}
-      {screen === 'gif1' && (
+      {screen === "gif1" && (
         <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-100 flex flex-col items-center justify-center p-8">
           <img
             src="https://i.ibb.co/5WXF6r7L/4572be0dfbefad294e5d4ab55b110bd2-1.gif"
             alt="GIF 1"
             className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
-          <Button onClick={() => setScreen('gif2')} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+          <Button
+            onClick={() => setScreen("gif2")}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+          >
             Next
           </Button>
         </div>
       )}
 
       {/* GIF 2 - Are you ready? */}
-      {screen === 'gif2' && (
+      {screen === "gif2" && (
         <div className="w-full h-full bg-gradient-to-br from-pink-200 to-pink-100 flex flex-col items-center justify-center p-8">
-          <h1 className="text-4xl font-display text-pink-700 mb-8">Are u ready for surprise?</h1>
+          <h1 className="text-4xl font-display text-pink-700 mb-8">
+            Are u ready for surprise?
+          </h1>
           <img
             src="https://i.ibb.co/SX7cfTGt/c37e7391eb8723e85aa7e0cfc59df31b.gif"
             alt="GIF 2"
             className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
           <div className="flex gap-6">
-            <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+            <Button
+              onClick={() => setScreen("giftgrid")}
+              className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+            >
               Yes
             </Button>
-            <Button onClick={() => setScreen('howdareyou')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+            <Button
+              onClick={() => setScreen("howdareyou")}
+              className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+            >
               No
             </Button>
           </div>
@@ -497,56 +605,87 @@ export default function Home() {
       )}
 
       {/* How Dare You */}
-      {screen === 'howdareyou' && (
+      {screen === "howdareyou" && (
         <div className="w-full h-full bg-gradient-to-br from-pink-200 to-pink-100 flex flex-col items-center justify-center p-8">
-          <h1 className="text-6xl font-display text-pink-700 mb-12">HOW DARE YOU!</h1>
+          <h1 className="text-6xl font-display text-pink-700 mb-12">
+            HOW DARE YOU!
+          </h1>
           <img
             src="https://i.ibb.co/TBJLC5Rq/image.gif"
             alt="How Dare You"
             className="w-80 h-80 mb-12 object-contain mix-blend-multiply"
           />
-          <Button onClick={() => setScreen('gif2')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+          <Button
+            onClick={() => setScreen("gif2")}
+            className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+          >
             TRY AGAIN
           </Button>
         </div>
       )}
 
       {/* Gift Grid - Full Screen */}
-      {screen === 'giftgrid' && (
+      {screen === "giftgrid" && (
         <div className="w-full h-full bg-gradient-to-br from-cyan-100 to-cyan-50 flex flex-col animate-fade-in pb-10">
           <div className="py-4 flex flex-col items-center">
-            <h1 className="text-5xl font-salita text-gray-800 mb-1 min-h-[60px]">{typedTitle}</h1>
-            <p className="text-lg font-salita text-gray-600 tracking-widest">CLICK ANY GIFT TO OPEN</p>
+            <h1 className="text-5xl font-salita text-gray-800 mb-1 min-h-[60px]">
+              {typedTitle}
+            </h1>
+            <p className="text-lg font-salita text-gray-600 tracking-widest">
+              CLICK ANY GIFT TO OPEN
+            </p>
           </div>
 
           <div className="flex-1 grid grid-cols-2 gap-4 p-4 place-items-center">
-            {[0, 1, 2, 3].map((idx) => (
+            {[0, 1, 2, 3].map(idx => (
               <button
                 key={idx}
                 onClick={() => {
-                  if (idx === 0) setScreen('box1');
-                  else if (idx === 1) setScreen('box2');
-                  else if (idx === 2) setScreen('box3');
-                  else setScreen('box4');
+                  if (idx === 0) setScreen("box1");
+                  else if (idx === 1) setScreen("box2");
+                  else if (idx === 2) setScreen("box3");
+                  else setScreen("box4");
                 }}
                 className="hover:scale-105 active:scale-95 transition-transform duration-300 group touch-manipulation"
-                style={{ width: '150px', height: '150px', padding: 0, backgroundColor: 'transparent', border: 'none', boxShadow: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                style={{
+                  width: "150px",
+                  height: "150px",
+                  padding: 0,
+                  backgroundColor: "transparent",
+                  border: "none",
+                  boxShadow: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <img
-                  src={getOptimizedUrl("https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp", 800)}
-                  srcSet={getSrcSet("https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp")}
+                  src={getOptimizedUrl(
+                    "https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp",
+                    800
+                  )}
+                  srcSet={getSrcSet(
+                    "https://i.ibb.co/yc1QfDRr/File-from-Anuj.webp"
+                  )}
                   alt="Gift Box"
                   width="400"
                   height="400"
                   loading="lazy"
-                  style={{ maxWidth: '100%', maxHeight: '100%', height: 'auto' }}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    height: "auto",
+                  }}
                 />
               </button>
             ))}
           </div>
 
           <div className="pb-6 flex justify-center">
-            <Button onClick={resetToFirstPage} className="bg-cyan-700 hover:bg-cyan-800 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+            <Button
+              onClick={resetToFirstPage}
+              className="bg-cyan-700 hover:bg-cyan-800 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+            >
               Try Again
             </Button>
           </div>
@@ -554,19 +693,27 @@ export default function Home() {
       )}
 
       {/* Box 1 - Full Screen */}
-      {screen === 'box1' && (
+      {screen === "box1" && (
         <div className="relative w-full h-full animate-fade-in bg-black">
-          <img 
-            src={getOptimizedUrl("https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg", 1200)}
-            srcSet={getSrcSet("https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg")}
-            alt="Box 1" 
+          <img
+            src={getOptimizedUrl(
+              "https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg",
+              1200
+            )}
+            srcSet={getSrcSet(
+              "https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg"
+            )}
+            alt="Box 1"
             width="1080"
             height="1920"
             loading="lazy"
-            className="w-full h-full object-contain" 
+            className="w-full h-full object-contain"
           />
           <div className="absolute bottom-12 left-0 right-0 flex justify-center">
-            <Button onClick={() => setScreen('giftgrid')} className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl border border-white/40">
+            <Button
+              onClick={() => setScreen("giftgrid")}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl border border-white/40"
+            >
               ← Back to Gifts
             </Button>
           </div>
@@ -574,50 +721,65 @@ export default function Home() {
       )}
 
       {/* Box 2 - Full Screen */}
-      {screen === 'box2' && (
+      {screen === "box2" && (
         <div className="w-full min-h-screen bg-gradient-to-br from-pink-300 via-pink-200 to-pink-100 flex flex-col items-center justify-center gap-8 animate-fade-in p-6">
           <img
             src="https://i.ibb.co/B5MJ6YZ4/05ec496d5faa05d450d280a6d1e9eca1.gif"
             alt="Box 2"
-            style={{ width: 'min(80vw, 70vh)', height: 'min(80vw, 70vh)' }}
+            style={{ width: "min(80vw, 70vh)", height: "min(80vw, 70vh)" }}
             className="object-contain mix-blend-multiply"
           />
-          <Button onClick={() => setScreen('giftgrid')} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl">
+          <Button
+            onClick={() => setScreen("giftgrid")}
+            className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl"
+          >
             ← Back to Gifts
           </Button>
         </div>
       )}
 
       {/* Box 3 - Cake Screen (Dark Background, Left-Right Layout) */}
-      {screen === 'box3' && !cakeBlow && (
+      {screen === "box3" && !cakeBlow && (
         <div className="w-full h-full bg-gray-900 flex items-center justify-center p-8 animate-fade-in">
           <div className="flex gap-12 max-w-5xl items-center w-full h-full">
             {/* Left: Text */}
             <div className="flex-1 text-white">
               <p className="text-2xl leading-relaxed font-serif">
-                Here's your<br />
-                virtual cake<br />
-                it's calorie-free<br />
+                Here's your
+                <br />
+                virtual cake
+                <br />
+                it's calorie-free
+                <br />
                 but full of love.
               </p>
               <p className="text-xl font-bold mt-6">
-                Blow your candle and<br />
+                Blow your candle and
+                <br />
                 make your wish
               </p>
             </div>
 
             {/* Right: Cake & Button */}
             <div className="flex-1 flex flex-col items-center justify-center">
-              <img 
-                src={getOptimizedUrl("https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png", 400)}
-                srcSet={getSrcSet("https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png")}
-                alt="Cake" 
+              <img
+                src={getOptimizedUrl(
+                  "https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png",
+                  400
+                )}
+                srcSet={getSrcSet(
+                  "https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png"
+                )}
+                alt="Cake"
                 width="256"
                 height="256"
                 loading="lazy"
-                className="w-64 h-64 object-contain mb-8" 
+                className="w-64 h-64 object-contain mb-8"
               />
-              <Button onClick={() => setCakeBlow(true)} className="bg-amber-100 hover:bg-amber-200 text-gray-900 px-8 py-3 text-lg font-bold rounded-lg shadow-lg border-2 border-amber-300">
+              <Button
+                onClick={() => setCakeBlow(true)}
+                className="bg-amber-100 hover:bg-amber-200 text-gray-900 px-8 py-3 text-lg font-bold rounded-lg shadow-lg border-2 border-amber-300"
+              >
                 BLOW
               </Button>
             </div>
@@ -626,23 +788,36 @@ export default function Home() {
       )}
 
       {/* Box 3 - Letter Screen (After Blow) */}
-      {screen === 'box3' && cakeBlow && (
+      {screen === "box3" && cakeBlow && (
         <div className="w-full h-full bg-gray-900 flex items-center justify-center p-4 md:p-8 animate-fade-in overflow-auto">
           <div className="flex flex-col md:flex-row gap-8 md:gap-12 max-w-6xl w-full items-center md:items-stretch pb-10">
             <div className="w-full md:flex-1 bg-white/95 rounded-2xl p-5 md:p-8 shadow-2xl md:max-h-[78vh] max-h-[55vh] overflow-y-auto border border-pink-100 backdrop-blur-sm">
-              <p className="text-gray-800 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-serif">{LETTER_TEXT}</p>
+              <p className="text-gray-800 text-sm md:text-base leading-relaxed whitespace-pre-wrap font-serif">
+                {LETTER_TEXT}
+              </p>
             </div>
             <div className="w-full md:flex-1 flex flex-col items-center justify-center">
-              <img 
-                src={getOptimizedUrl("https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png", 400)}
-                srcSet={getSrcSet("https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png")}
-                alt="Cake" 
+              <img
+                src={getOptimizedUrl(
+                  "https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png",
+                  400
+                )}
+                srcSet={getSrcSet(
+                  "https://i.ibb.co/h1M7sq5v/vecteezy-pink-birthday-cake-with-candles-render-on-transparent-68012421.png"
+                )}
+                alt="Cake"
                 width="256"
                 height="256"
                 loading="lazy"
-                className="w-52 h-52 md:w-64 md:h-64 object-contain mb-6 md:mb-8" 
+                className="w-52 h-52 md:w-64 md:h-64 object-contain mb-6 md:mb-8"
               />
-              <Button onClick={() => { setScreen('giftgrid'); setCakeBlow(false); }} className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg">
+              <Button
+                onClick={() => {
+                  setScreen("giftgrid");
+                  setCakeBlow(false);
+                }}
+                className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-bold rounded-full shadow-lg"
+              >
                 Back
               </Button>
             </div>
@@ -651,25 +826,32 @@ export default function Home() {
       )}
 
       {/* Box 4 - Full Screen */}
-      {screen === 'box4' && (
+      {screen === "box4" && (
         <div className="relative w-full h-full animate-fade-in bg-black">
           <img
-            src={getOptimizedUrl("https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg", 1200)}
-            srcSet={getSrcSet("https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg")}
-            alt="Box 4" 
+            src={getOptimizedUrl(
+              "https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg",
+              1200
+            )}
+            srcSet={getSrcSet(
+              "https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg"
+            )}
+            alt="Box 4"
             width="1080"
             height="1920"
             loading="lazy"
-            className="w-full h-full object-contain" 
+            className="w-full h-full object-contain"
           />
           <div className="absolute bottom-12 left-0 right-0 flex justify-center">
-            <Button onClick={() => setScreen('giftgrid')} className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl border border-white/40">
+            <Button
+              onClick={() => setScreen("giftgrid")}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-8 py-3 text-lg font-bold rounded-full shadow-xl border border-white/40"
+            >
               ← Back to Gifts
             </Button>
           </div>
         </div>
       )}
-
     </div>
   );
 }
