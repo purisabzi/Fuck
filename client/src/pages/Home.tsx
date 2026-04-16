@@ -82,7 +82,7 @@ export default function Home() {
   const [cakeBlow, setCakeBlow] = useState(false);
   const [showWonBox, setShowWonBox] = useState(false);
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
-  const [gameState, setGameState] = useState<"playing" | "ai-turn" | "won" | "draw">("playing");
+  const [gameState, setGameState] = useState<"playing" | "ai-turn" | "won" | "lost" | "draw">("playing");
   const [typedTitle, setTypedTitle] = useState('');
   const mainAudioRef = React.useRef<HTMLAudioElement>(null);
   const box4AudioRef = React.useRef<HTMLAudioElement>(null);
@@ -218,7 +218,7 @@ export default function Home() {
       const result = calculateWinner(newBoard);
       if (result) {
         setWinningLine(result.line);
-        setGameState("won");
+        setGameState("lost");
         return;
       }
 
@@ -233,9 +233,9 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [gameState, board]);
 
-  // Show won box after a short delay when game is won
+  // Show won box after a short delay when game is won or lost
   useEffect(() => {
-    if (gameState !== "won") return;
+    if (gameState !== "won" && gameState !== "lost") return;
     const timer = setTimeout(() => setShowWonBox(true), 600);
     return () => clearTimeout(timer);
   }, [gameState]);
@@ -421,15 +421,31 @@ export default function Home() {
           {showWonBox && (
             <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-50 overflow-hidden">
               <div className="relative bg-gradient-to-br from-pink-50 to-white rounded-3xl p-12 shadow-2xl text-center animate-bounce border border-pink-200">
-                <FloatingHearts />
-                <p className="text-4xl font-display text-pink-600 mb-8 relative z-10">You won!</p>
+                {gameState === "won" && <FloatingHearts />}
+                {gameState === "lost" && (
+                  <div className="flex justify-center mb-6 relative z-10">
+                    <img
+                      src="https://media1.tenor.com/m/ZZ-3mcIqE5oAAAAC/love-hearts.gif"
+                      alt="Love Hearts"
+                      width="120"
+                      height="120"
+                      className="rounded-2xl drop-shadow-lg"
+                      style={{ animation: 'float 3s ease-in-out infinite' }}
+                    />
+                  </div>
+                )}
+                <p className="text-4xl font-display text-pink-600 mb-8 relative z-10">
+                  {gameState === "won" ? "You won!" : "You lost! Try again 💪"}
+                </p>
                 <div className="flex gap-4 justify-center relative z-10">
                   <Button onClick={resetGame} className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 text-sm font-bold rounded-full">
                     Play Again
                   </Button>
-                  <Button onClick={() => { setScreen('gif1'); playMusic(); resetGame(); }} className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full">
-                    Next
-                  </Button>
+                  {gameState === "won" && (
+                    <Button onClick={() => { setScreen('gif1'); playMusic(); resetGame(); }} className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 text-sm font-bold rounded-full">
+                      Next
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -541,8 +557,8 @@ export default function Home() {
       {screen === 'box1' && (
         <div className="relative w-full h-full animate-fade-in bg-black">
           <img 
-            src={getOptimizedUrl("https://i.ibb.co/gM13LnLf/Screenshot-20260408-190917-Instagram.jpg", 1200)}
-            srcSet={getSrcSet("https://i.ibb.co/gM13LnLf/Screenshot-20260408-190917-Instagram.jpg")}
+            src={getOptimizedUrl("https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg", 1200)}
+            srcSet={getSrcSet("https://i.ibb.co/JjVHMj6J/bad526e3dbdfea830f3c50616f3c40bd.jpg")}
             alt="Box 1" 
             width="1080"
             height="1920"
@@ -637,9 +653,9 @@ export default function Home() {
       {/* Box 4 - Full Screen */}
       {screen === 'box4' && (
         <div className="relative w-full h-full animate-fade-in bg-black">
-          <img 
-            src={getOptimizedUrl("https://i.ibb.co/jky0Dy6x/IMG-20260408-192558-572.jpg", 1200)}
-            srcSet={getSrcSet("https://i.ibb.co/jky0Dy6x/IMG-20260408-192558-572.jpg")}
+          <img
+            src={getOptimizedUrl("https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg", 1200)}
+            srcSet={getSrcSet("https://i.ibb.co/fY2gSKGc/IMG-20260416-053143-159.jpg")}
             alt="Box 4" 
             width="1080"
             height="1920"
